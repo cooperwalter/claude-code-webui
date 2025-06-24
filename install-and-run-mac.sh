@@ -308,6 +308,22 @@ echo "==========================================
 ==========================================
 "
 
+# Function to find ngrok
+find_ngrok() {
+    # Check common locations
+    if command -v ngrok >/dev/null 2>&1; then
+        echo "ngrok"
+    elif [ -x "/usr/local/bin/ngrok" ]; then
+        echo "/usr/local/bin/ngrok"
+    elif [ -x "/opt/homebrew/bin/ngrok" ]; then
+        echo "/opt/homebrew/bin/ngrok"
+    elif [ -x "$HOME/.local/bin/ngrok" ]; then
+        echo "$HOME/.local/bin/ngrok"
+    else
+        echo ""
+    fi
+}
+
 # Function to cleanup on exit
 cleanup() {
     echo ""
@@ -319,8 +335,26 @@ cleanup() {
 
 trap cleanup INT TERM EXIT
 
+# Find ngrok
+NGROK_CMD=$(find_ngrok)
+if [ -z "$NGROK_CMD" ]; then
+    echo "❌ Ngrok not found!"
+    echo ""
+    echo "Please install ngrok:"
+    echo "  brew install ngrok/ngrok/ngrok"
+    echo ""
+    echo "Or download from: https://ngrok.com/download"
+    echo ""
+    echo "Starting without ngrok (local access only)..."
+    echo ""
+    ./claude-code-webui --host 0.0.0.0
+    exit 0
+fi
+
+echo "Found ngrok at: $NGROK_CMD"
+
 # Start Claude Code Web UI
-echo "Starting Claude Code Web UI (read-only mode)..."
+echo "Starting Claude Code Web UI..."
 echo ""
 echo "Note: Read-only mode must be configured in your chat requests."
 echo "The web UI will show which tools are allowed."
@@ -332,6 +366,7 @@ sleep 2
 
 if ! kill -0 $CLAUDE_PID 2>/dev/null; then
     echo "Failed to start Claude Code Web UI"
+    echo "Error log:"
     cat /tmp/claude-webui.log
     exit 1
 fi
@@ -341,22 +376,43 @@ echo ""
 
 # Start ngrok
 echo "Starting ngrok tunnel..."
-ngrok http 8999 > /tmp/ngrok.log 2>&1 &
+$NGROK_CMD http 8999 > /tmp/ngrok.log 2>&1 &
 NGROK_PID=$!
 
-echo "Waiting for ngrok URL..."
-sleep 4
+# Wait for ngrok to fully start
+echo "Waiting for ngrok to initialize..."
+for i in {1..10}; do
+    if curl -s http://localhost:4040/api >/dev/null 2>&1; then
+        break
+    fi
+    sleep 1
+done
 
 # Get the public URL
-NGROK_URL=$(curl -s http://localhost:4040/api/tunnels 2>/dev/null | grep -o '"public_url":"https://[^"]*' | cut -d'"' -f4 | head -1)
-
-if [ -z "$NGROK_URL" ]; then
-    sleep 2
+echo "Getting ngrok URL..."
+NGROK_URL=""
+for i in {1..5}; do
     NGROK_URL=$(curl -s http://localhost:4040/api/tunnels 2>/dev/null | grep -o '"public_url":"https://[^"]*' | cut -d'"' -f4 | head -1)
-fi
+    if [ -n "$NGROK_URL" ]; then
+        break
+    fi
+    sleep 1
+done
 
 if [ -z "$NGROK_URL" ]; then
-    echo "Note: Ngrok URL not available yet. Trying local access..."
+    echo "⚠️  Could not get ngrok URL. Checking ngrok status..."
+    if ! kill -0 $NGROK_PID 2>/dev/null; then
+        echo "Ngrok failed to start. Error log:"
+        cat /tmp/ngrok.log | head -20
+        echo ""
+        echo "Starting without ngrok (local access only)..."
+        echo ""
+        echo "Access Claude Code Web UI at: http://localhost:8999"
+        echo ""
+        echo "Press Ctrl+C to stop"
+        wait $CLAUDE_PID
+        exit 0
+    fi
     NGROK_URL="http://localhost:8999"
 fi
 
@@ -365,11 +421,18 @@ echo "=========================================="
 echo "  🚀 Claude Code Web UI is Ready!"
 echo "=========================================="
 echo ""
-echo "📱 Access from anywhere:"
-echo "$NGROK_URL"
-echo ""
-echo "$NGROK_URL" | pbcopy
-echo "(URL copied to clipboard)"
+if [[ "$NGROK_URL" == https://* ]]; then
+    echo "📱 Access from anywhere:"
+    echo "$NGROK_URL"
+    echo ""
+    echo "$NGROK_URL" | pbcopy
+    echo "(URL copied to clipboard)"
+else
+    echo "📱 Local access only:"
+    echo "http://localhost:8999"
+    echo ""
+    echo "Note: Ngrok URL not available"
+fi
 echo ""
 echo "🔒 Security Mode: READ-ONLY"
 echo "Claude can:"
@@ -381,7 +444,9 @@ echo "  • Modify or delete files"
 echo "  • Run dangerous commands"
 echo ""
 echo "Local access: http://localhost:8999"
-echo "Ngrok dashboard: http://localhost:4040"
+if [[ "$NGROK_URL" == https://* ]]; then
+    echo "Ngrok dashboard: http://localhost:4040"
+fi
 echo ""
 echo "Press Ctrl+C to stop"
 echo ""
