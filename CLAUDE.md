@@ -260,7 +260,7 @@ cd .. && make check
 
 ```bash
 # Copilot inline comments aren't shown in gh pr view
-gh api repos/sugyan/claude-code-webui/pulls/PR_NUMBER/comments
+gh api repos/cooperwalter/claude-code-webui/pulls/PR_NUMBER/comments
 ```
 
 ## Project Structure

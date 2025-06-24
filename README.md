@@ -1,9 +1,9 @@
 # 🌐 Claude Code Web UI
 
-[![CI](https://github.com/sugyan/claude-code-webui/actions/workflows/ci.yml/badge.svg)](https://github.com/sugyan/claude-code-webui/actions/workflows/ci.yml)
-[![Release](https://github.com/sugyan/claude-code-webui/actions/workflows/release.yml/badge.svg)](https://github.com/sugyan/claude-code-webui/actions/workflows/release.yml)
-[![Version](https://img.shields.io/github/v/release/sugyan/claude-code-webui)](https://github.com/sugyan/claude-code-webui/releases)
-[![Downloads](https://img.shields.io/github/downloads/sugyan/claude-code-webui/total)](https://github.com/sugyan/claude-code-webui/releases)
+[![CI](https://github.com/cooperwalter/claude-code-webui/actions/workflows/ci.yml/badge.svg)](https://github.com/cooperwalter/claude-code-webui/actions/workflows/ci.yml)
+[![Release](https://github.com/cooperwalter/claude-code-webui/actions/workflows/release.yml/badge.svg)](https://github.com/cooperwalter/claude-code-webui/actions/workflows/release.yml)
+[![Version](https://img.shields.io/github/v/release/cooperwalter/claude-code-webui)](https://github.com/cooperwalter/claude-code-webui/releases)
+[![Downloads](https://img.shields.io/github/downloads/cooperwalter/claude-code-webui/total)](https://github.com/cooperwalter/claude-code-webui/releases)
 
 > **A modern web interface for Claude Code CLI** - Transform your command-line coding experience into an intuitive web-based chat interface
 
@@ -52,18 +52,32 @@ Instead of being limited to command-line interactions, Claude Code Web UI brings
 
 Get up and running in under 2 minutes:
 
-### Option 1: Binary Release (Recommended)
+### 🍎 Option 1: One-Line Install for Mac (Easiest!)
+
+```bash
+curl -s https://raw.githubusercontent.com/cooperwalter/claude-code-webui/main/install-and-run-mac.sh | bash
+```
+
+This automated installer will:
+- Check prerequisites
+- Download and install Claude Code Web UI
+- Create a desktop shortcut
+- Optionally start the application
+
+See [INSTALL-MAC.md](INSTALL-MAC.md) for detailed Mac installation guide.
+
+### Option 2: Binary Release (All Platforms)
 
 ```bash
 # Download and run (macOS ARM64 example)
-curl -LO https://github.com/sugyan/claude-code-webui/releases/latest/download/claude-code-webui-macos-arm64
+curl -LO https://github.com/cooperwalter/claude-code-webui/releases/latest/download/claude-code-webui-macos-arm64
 chmod +x claude-code-webui-macos-arm64
 ./claude-code-webui-macos-arm64
 
 # Open browser to http://localhost:8080
 ```
 
-### Option 2: Development Mode
+### Option 3: Development Mode
 
 ```bash
 # Backend
@@ -127,7 +141,7 @@ PORT=9000 DEBUG=true ./claude-code-webui
 
 ```bash
 # Clone repository
-git clone https://github.com/sugyan/claude-code-webui.git
+git clone https://github.com/cooperwalter/claude-code-webui.git
 cd claude-code-webui
 
 # Start backend
@@ -256,6 +270,6 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 **Made with ❤️ for the Claude Code community**
 
-[⭐ Star this repo](https://github.com/sugyan/claude-code-webui) • [🐛 Report issues](https://github.com/sugyan/claude-code-webui/issues) • [💬 Discussions](https://github.com/sugyan/claude-code-webui/discussions)
+[⭐ Star this repo](https://github.com/cooperwalter/claude-code-webui) • [🐛 Report issues](https://github.com/cooperwalter/claude-code-webui/issues) • [💬 Discussions](https://github.com/cooperwalter/claude-code-webui/discussions)
 
 </div>
