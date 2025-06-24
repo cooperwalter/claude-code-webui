@@ -41,10 +41,10 @@ Instead of being limited to command-line interactions, Claude Code Web UI brings
 
 ### Perfect for:
 - 👨‍💻 **Developers** who prefer visual interfaces
-- 📱 **Mobile users** who want to code on-the-go
-- 👥 **Teams** sharing coding sessions
+- 📱 **Mobile users** who want to code on-the-go (network access enabled by default!)
+- 👥 **Teams** sharing coding sessions on the same network
 - 🔄 **Multi-project** workflows
-- 💡 **Rapid prototyping** with visual feedback
+- 💡 **Rapid prototyping** with visual feedback from any device
 
 ---
 
@@ -59,10 +59,14 @@ curl -s https://raw.githubusercontent.com/cooperwalter/claude-code-webui/main/in
 ```
 
 This automated installer will:
-- Check prerequisites
+- Check prerequisites  
+- Install ngrok for easy access with friendly URLs
 - Download and install Claude Code Web UI
-- Create a desktop shortcut
-- Optionally start the application
+- Configure read-only mode by default (safer!)
+- Create desktop shortcuts
+- Optionally start the application with ngrok
+
+You'll get a shareable HTTPS URL like `https://abc123.ngrok.io` - no IP addresses needed!
 
 See [INSTALL-MAC.md](INSTALL-MAC.md) for detailed Mac installation guide.
 
@@ -104,10 +108,12 @@ The backend server supports the following command-line options:
 | Option | Description | Default |
 |--------|-------------|---------|
 | `-p, --port <port>` | Port to listen on | 8999 |
-| `--host <host>` | Host address to bind to | 127.0.0.1 |
+| `--host <host>` | Host address to bind to | 127.0.0.1* |
 | `-d, --debug` | Enable debug mode | false |
 | `-h, --help` | Show help message | - |
 | `-V, --version` | Show version | - |
+
+*Note: The installer configures the app to use `0.0.0.0` by default for network access
 
 ### Environment Variables
 

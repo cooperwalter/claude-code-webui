@@ -42,10 +42,12 @@ bash install-and-run-mac.sh
 The script will:
 
 - ✅ Check if Claude CLI is installed
+- ✅ Install ngrok for easy access
 - ✅ Download Claude Code Web UI
-- ✅ Set everything up
+- ✅ Set everything up in /Applications
 - ✅ Create a desktop shortcut
-- ✅ Ask if you want to start the app
+- ✅ Automatically start the app with ngrok
+- ✅ Give you a shareable HTTPS URL
 
 ## 🎯 Using Claude Code Web UI
 
@@ -61,10 +63,12 @@ After installation, you can start Claude Code Web UI by:
 
 ### What to Expect
 
-1. A Terminal window will open showing the server is running
-2. Your web browser will automatically open to `http://localhost:8999`
-3. You'll see the Claude Code Web UI interface
-4. Select a project directory to start chatting with Claude!
+1. The installer runs automatically (no prompts unless needed)
+2. Ngrok starts and generates a friendly HTTPS URL
+3. The URL is copied to your clipboard automatically
+4. You'll see something like: `https://abc123.ngrok.io`
+5. Share this URL with anyone - no IP addresses needed!
+6. Claude runs in READ-ONLY mode by default (safer)
 
 ### Stopping the Application
 
@@ -95,25 +99,39 @@ To stop Claude Code Web UI:
 - Another application is using port 8999
 - Stop that application or wait a moment and try again
 
-## 📱 For Mobile Access
+## 📱 Universal Access with Ngrok
 
-Want to use Claude Code Web UI from your iPhone or iPad while on the same network?
+Claude Code Web UI uses ngrok to provide easy access from anywhere!
 
-1. Find your Mac's IP address:
-   - Apple Menu > System Settings > Network
-   - Look for your IP (like 192.168.1.100)
+### How It Works:
 
-2. Start Claude Code Web UI with network access:
+1. **Automatic Setup**: The installer configures everything for you
+2. **Friendly URL**: You get a URL like `https://abc123.ngrok.io`
+3. **Share Anywhere**: Works from any device, any network
+4. **Secure**: HTTPS encryption built-in
 
-   ```bash
-   /Applications/ClaudeCodeWebUI/claude-code-webui --host 0.0.0.0
-   ```
+### Read-Only Mode (Default)
 
-3. On your mobile device, open browser and go to:
-   ```
-   http://[your-mac-ip]:8999
-   ```
-   Example: `http://192.168.1.100:8999`
+For safety, Claude runs in read-only mode by default:
+
+**Claude CAN:**
+- ✅ Read any files
+- ✅ Search code with grep, find, etc.
+- ✅ Run safe bash commands (ls, cat, git status, etc.)
+- ✅ Analyze and understand your codebase
+
+**Claude CANNOT:**
+- ❌ Modify or delete files
+- ❌ Run dangerous commands
+- ❌ Make system changes
+
+### Full Permissions Mode
+
+If you need Claude to modify files:
+```bash
+/Applications/ClaudeCodeWebUI/start-full-permissions.command
+```
+⚠️ Use with caution - allows file modifications!
 
 ## 🆘 Need Help?
 

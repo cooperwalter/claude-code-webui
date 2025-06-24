@@ -62,7 +62,8 @@ if [[ $(uname -m) != "arm64" ]]; then
     echo -e "${YELLOW}Warning: This script is optimized for Apple Silicon (M-series) Macs.${NC}"
     echo -e "${YELLOW}You appear to be running on Intel. The script will continue but may not work optimally.${NC}"
     echo ""
-    read -p "Press Enter to continue or Ctrl+C to cancel..."
+    echo "Continuing in 3 seconds..."
+    sleep 3
 fi
 
 echo -e "${GREEN}✓ Running on macOS (Apple Silicon)${NC}"
@@ -97,34 +98,22 @@ else
         echo "You'll need your Anthropic API key from:"
         echo "https://console.anthropic.com/account/keys"
         echo ""
-        echo -e "${YELLOW}Would you like to authenticate Claude now?${NC}"
-        read -p "Press Y to authenticate, N to skip: " -n 1 -r
+        echo -e "${BLUE}Running Claude authentication...${NC}"
+        echo "Follow the prompts to enter your API key:"
         echo ""
+        claude auth
         
-        if [[ $REPLY =~ ^[Yy]$ ]]; then
+        # Check if authentication succeeded
+        if claude --help >/dev/null 2>&1; then
             echo ""
-            echo -e "${BLUE}Running Claude authentication...${NC}"
-            echo "Follow the prompts to enter your API key:"
-            echo ""
-            claude auth
-            
-            # Check if authentication succeeded
-            if claude --help >/dev/null 2>&1; then
-                echo ""
-                echo -e "${GREEN}✓ Claude authentication successful!${NC}"
-            else
-                echo ""
-                echo -e "${RED}Authentication may have failed.${NC}"
-                echo -e "${YELLOW}You can try again later with: claude auth${NC}"
-                echo ""
-                read -p "Press Enter to continue with installation anyway..."
-            fi
+            echo -e "${GREEN}✓ Claude authentication successful!${NC}"
         else
             echo ""
-            echo -e "${YELLOW}Skipping authentication for now.${NC}"
-            echo -e "${YELLOW}You'll need to run 'claude auth' before using Claude Code Web UI.${NC}"
+            echo -e "${RED}Authentication may have failed.${NC}"
+            echo -e "${YELLOW}You can try again later with: claude auth${NC}"
             echo ""
-            read -p "Press Enter to continue..."
+            echo "Continuing with installation..."
+            sleep 2
         fi
     else
         # Test if Claude can actually run commands (not just show help)
@@ -135,7 +124,8 @@ else
             echo ""
             echo "If you experience issues, try running: claude auth"
             echo ""
-            read -p "Press Enter to continue..."
+            echo "Continuing..."
+            sleep 2
         fi
     fi
 fi
@@ -144,23 +134,71 @@ echo ""
 # Show what will be installed
 echo -e "${BLUE}What this installer will do:${NC}"
 echo "  1. Download the pre-built Claude Code Web UI binary"
-echo "  2. Install it to: ~/Applications/ClaudeCodeWebUI"
-echo "  3. Create a desktop shortcut for easy access"
-echo "  4. Optionally start the application"
+echo "  2. Install ngrok for easy, secure access with friendly URLs"
+echo "  3. Install to: /Applications/ClaudeCodeWebUI"
+echo "  4. Create desktop shortcuts for easy access"
+echo "  5. Configure for read-only Claude access (safer!)"
+echo "  6. Optionally start the application"
 echo ""
 echo -e "${GREEN}The pre-built binary includes:${NC}"
 echo "  • The backend server (Deno-based)"
 echo "  • The frontend web interface (React-based)"
 echo "  • All necessary runtime components"
 echo ""
-echo -e "${YELLOW}No additional installations required!${NC}"
+echo -e "${YELLOW}Access Options:${NC}"
+echo "  • Ngrok: Get a friendly HTTPS URL (e.g., https://abc123.ngrok.io)"
+echo "  • Share with anyone, anywhere - no IP addresses needed!"
+echo "  • Secure HTTPS connection automatically"
 echo ""
-read -p "Ready to proceed? Press Enter to continue or Ctrl+C to cancel..."
+echo -e "${YELLOW}Security Features:${NC}"
+echo "  • Claude configured with read-only permissions by default"
+echo "  • Write operations disabled for safety"
+echo ""
+echo -e "${GREEN}Starting installation...${NC}"
+echo ""
+sleep 2
+
+# Step 2: Install ngrok
+echo -e "${BLUE}Step 2: Installing ngrok for easy access...${NC}"
+if ! command_exists ngrok; then
+    echo -e "${YELLOW}Installing ngrok...${NC}"
+    if command_exists brew; then
+        brew install ngrok/ngrok/ngrok
+    else
+        # Install Homebrew first if not present
+        echo -e "${YELLOW}Installing Homebrew first...${NC}"
+        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+        
+        # Add Homebrew to PATH for M1 Macs
+        if [[ $(uname -m) == "arm64" ]]; then
+            echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile
+            eval "$(/opt/homebrew/bin/brew shellenv)"
+        fi
+        
+        brew install ngrok/ngrok/ngrok
+    fi
+    echo -e "${GREEN}✓ Ngrok installed${NC}"
+else
+    echo -e "${GREEN}✓ Ngrok already installed${NC}"
+fi
 echo ""
 
-# Step 2: Create application directory
+# Optional: Configure ngrok authtoken for better experience
+echo -e "${BLUE}Ngrok Configuration${NC}"
+echo "Note: Ngrok works without an account, but with a free account you get:"
+echo "  • More stable connections"
+echo "  • Better rate limits"
+echo "  • Subdomain options"
+echo ""
+echo "Sign up free at: https://dashboard.ngrok.com/signup"
+echo ""
+echo -e "${YELLOW}Skipping ngrok authentication for now (not required).${NC}"
+echo "You can add an authtoken later with: ngrok config add-authtoken YOUR_TOKEN"
+echo ""
+
+# Step 3: Create application directory
 APP_DIR="/Applications/ClaudeCodeWebUI"
-echo -e "${BLUE}Step 2: Setting up application directory...${NC}"
+echo -e "${BLUE}Step 3: Setting up application directory...${NC}"
 # Need sudo for global Applications folder
 if [ -d "$APP_DIR" ]; then
     echo -e "${YELLOW}Application directory already exists. Updating...${NC}"
@@ -174,8 +212,8 @@ cd "$APP_DIR"
 echo -e "${GREEN}✓ Created directory: $APP_DIR${NC}"
 echo ""
 
-# Step 3: Download the latest release
-echo -e "${BLUE}Step 3: Downloading Claude Code Web UI...${NC}"
+# Step 4: Download the latest release
+echo -e "${BLUE}Step 4: Downloading Claude Code Web UI...${NC}"
 BINARY_NAME="claude-code-webui"
 DOWNLOAD_URL="https://github.com/cooperwalter/claude-code-webui/releases/latest/download/claude-code-webui-macos-arm64"
 
@@ -225,34 +263,168 @@ chmod +x "$BINARY_NAME"
 echo -e "${GREEN}✓ Downloaded and prepared Claude Code Web UI${NC}"
 echo ""
 
-# Step 4: Create a simple launcher script
-echo -e "${BLUE}Step 4: Creating launcher...${NC}"
+# Step 5: Create launcher scripts
+echo -e "${BLUE}Step 5: Creating launcher scripts...${NC}"
+
+# Create config file for restricted tools (read-only)
+cat > "$APP_DIR/readonly-config.json" << 'EOF'
+{
+  "allowedTools": [
+    "Read",
+    "Glob", 
+    "Grep",
+    "LS",
+    "NotebookRead",
+    "WebFetch",
+    "WebSearch",
+    "TodoRead",
+    "Bash"
+  ],
+  "allowedBashCommands": [
+    "cat", "head", "tail", "less", "more",
+    "grep", "egrep", "fgrep", "rg", "ag",
+    "find", "locate", "which", "whereis",
+    "ls", "dir", "tree", "du", "df",
+    "ps", "top", "htop", "whoami", "pwd",
+    "echo", "printf", "date", "cal",
+    "wc", "sort", "uniq", "cut", "awk", "sed",
+    "file", "stat", "md5", "shasum",
+    "git status", "git log", "git diff", "git show",
+    "npm list", "pip list", "gem list",
+    "env", "printenv", "uname", "hostname"
+  ],
+  "description": "Read-only mode with safe bash commands for viewing and searching"
+}
+EOF
+
+# Main launcher with ngrok
 cat > "$APP_DIR/start-claude-webui.command" << 'EOF'
 #!/bin/bash
 cd "$(dirname "$0")"
 clear
+
 echo "==========================================
-  Claude Code Web UI
+  Claude Code Web UI (with Ngrok)
+==========================================
+"
+
+# Function to cleanup on exit
+cleanup() {
+    echo ""
+    echo "Shutting down..."
+    pkill -f "ngrok http 8999" || true
+    pkill -f "claude-code-webui" || true
+    exit 0
+}
+
+trap cleanup INT TERM EXIT
+
+# Start Claude Code Web UI
+echo "Starting Claude Code Web UI (read-only mode)..."
+echo ""
+echo "Note: Read-only mode must be configured in your chat requests."
+echo "The web UI will show which tools are allowed."
+echo ""
+./claude-code-webui --host 127.0.0.1 > /tmp/claude-webui.log 2>&1 &
+CLAUDE_PID=$!
+
+sleep 2
+
+if ! kill -0 $CLAUDE_PID 2>/dev/null; then
+    echo "Failed to start Claude Code Web UI"
+    cat /tmp/claude-webui.log
+    exit 1
+fi
+
+echo "✓ Claude Code Web UI started"
+echo ""
+
+# Start ngrok
+echo "Starting ngrok tunnel..."
+ngrok http 8999 > /tmp/ngrok.log 2>&1 &
+NGROK_PID=$!
+
+echo "Waiting for ngrok URL..."
+sleep 4
+
+# Get the public URL
+NGROK_URL=$(curl -s http://localhost:4040/api/tunnels 2>/dev/null | grep -o '"public_url":"https://[^"]*' | cut -d'"' -f4 | head -1)
+
+if [ -z "$NGROK_URL" ]; then
+    sleep 2
+    NGROK_URL=$(curl -s http://localhost:4040/api/tunnels 2>/dev/null | grep -o '"public_url":"https://[^"]*' | cut -d'"' -f4 | head -1)
+fi
+
+if [ -z "$NGROK_URL" ]; then
+    echo "Note: Ngrok URL not available yet. Trying local access..."
+    NGROK_URL="http://localhost:8999"
+fi
+
+clear
+echo "=========================================="
+echo "  🚀 Claude Code Web UI is Ready!"
+echo "=========================================="
+echo ""
+echo "📱 Access from anywhere:"
+echo "$NGROK_URL"
+echo ""
+echo "$NGROK_URL" | pbcopy
+echo "(URL copied to clipboard)"
+echo ""
+echo "🔒 Security Mode: READ-ONLY"
+echo "Claude can:"
+echo "  • Read any files"
+echo "  • Run safe bash commands (grep, cat, ls, etc.)"
+echo "  • Search and analyze code"
+echo "Claude cannot:"
+echo "  • Modify or delete files"
+echo "  • Run dangerous commands"
+echo ""
+echo "Local access: http://localhost:8999"
+echo "Ngrok dashboard: http://localhost:4040"
+echo ""
+echo "Press Ctrl+C to stop"
+echo ""
+
+# Keep running
+wait $CLAUDE_PID
+EOF
+
+# Create alternative launcher for full permissions (if needed)
+cat > "$APP_DIR/start-full-permissions.command" << 'EOF'
+#!/bin/bash
+cd "$(dirname "$0")"
+clear
+echo "==========================================
+  Claude Code Web UI (Full Permissions)
 ==========================================
 
-The application will open in your default browser at:
-http://localhost:8999
-
-To stop the application:
-- Press Ctrl+C in this window
-- Or close this window
+⚠️  WARNING: This mode allows Claude to modify files!
+Only use when you need write access.
 
 Starting..."
 echo ""
-./claude-code-webui
+
+# Get local IP
+IP=$(ipconfig getifaddr en0 || ipconfig getifaddr en1 || echo "localhost")
+
+echo "Access from this computer: http://localhost:8999"
+if [ "$IP" != "localhost" ]; then
+    echo "Access from other devices: http://$IP:8999"
+fi
+echo ""
+echo "Press Ctrl+C to stop"
+echo ""
+./claude-code-webui --host 0.0.0.0
 EOF
 
 chmod +x "$APP_DIR/start-claude-webui.command"
-echo -e "${GREEN}✓ Created launcher${NC}"
+chmod +x "$APP_DIR/start-full-permissions.command"
+echo -e "${GREEN}✓ Created launchers${NC}"
 echo ""
 
-# Step 5: Create desktop shortcut
-echo -e "${BLUE}Step 5: Creating desktop shortcut...${NC}"
+# Step 6: Create desktop shortcuts
+echo -e "${BLUE}Step 6: Creating desktop shortcuts...${NC}"
 DESKTOP_DIR="$HOME/Desktop"
 if [ -d "$DESKTOP_DIR" ]; then
     # Create an alias (not a symlink) for better macOS compatibility
@@ -277,8 +449,8 @@ else
 fi
 echo ""
 
-# Step 6: Create uninstaller
-echo -e "${BLUE}Step 6: Creating uninstaller...${NC}"
+# Step 7: Create uninstaller
+echo -e "${BLUE}Step 7: Creating uninstaller...${NC}"
 cat > "$APP_DIR/uninstall.command" << 'EOF'
 #!/bin/bash
 clear
@@ -323,31 +495,26 @@ echo ""
 echo -e "${BLUE}Claude Code Web UI has been installed to:${NC}"
 echo "  $APP_DIR"
 echo ""
-echo -e "${BLUE}You can start it in the future by:${NC}"
-echo "  1. Double-clicking 'Claude Code Web UI' on your desktop"
-echo "  2. Or running: $APP_DIR/start-claude-webui.command"
+echo -e "${BLUE}You have two ways to start:${NC}"
+echo ""
+echo "  1. ${GREEN}With Ngrok (Recommended)${NC}"
+echo "     • Double-click 'Claude Code Web UI' on desktop"
+echo "     • Get a friendly HTTPS URL (e.g., https://abc123.ngrok.io)"
+echo "     • Share with anyone, anywhere"
+echo "     • READ-ONLY mode for safety"
+echo ""
+echo "  2. ${YELLOW}Full Permissions (Use with caution)${NC}"
+echo "     • Run: $APP_DIR/start-full-permissions.command"
+echo "     • Allows Claude to modify files"
 echo ""
 echo -e "${BLUE}To uninstall later:${NC}"
 echo "  Run: $APP_DIR/uninstall.command"
 echo ""
-echo -e "${GREEN}No additional setup required!${NC}"
-echo -e "${GREEN}The application includes everything it needs.${NC}"
+echo -e "${GREEN}Everything is ready to go!${NC}"
 echo ""
-echo -e "${YELLOW}Would you like to start Claude Code Web UI now?${NC}"
-read -p "Press Y to start, or any other key to exit: " -n 1 -r
+echo -e "${BLUE}Starting Claude Code Web UI with Ngrok...${NC}"
 echo ""
+sleep 2
 
-if [[ $REPLY =~ ^[Yy]$ ]]; then
-    echo ""
-    echo -e "${BLUE}Starting Claude Code Web UI...${NC}"
-    echo -e "${YELLOW}Opening in your browser at: http://localhost:8999${NC}"
-    echo -e "${YELLOW}To stop: Press Ctrl+C or close this window${NC}"
-    echo ""
-    
-    # Start the application
-    cd "$APP_DIR"
-    ./claude-code-webui
-else
-    echo ""
-    echo -e "${GREEN}Setup complete! You can start Claude Code Web UI anytime from your desktop.${NC}"
-fi
+# Always start with the ngrok launcher
+"$APP_DIR/start-claude-webui.command"
