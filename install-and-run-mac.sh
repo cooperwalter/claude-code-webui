@@ -127,6 +127,25 @@ echo -e "${BLUE}Step 3: Downloading Claude Code Web UI...${NC}"
 BINARY_NAME="claude-code-webui"
 DOWNLOAD_URL="https://github.com/cooperwalter/claude-code-webui/releases/latest/download/claude-code-webui-macos-arm64"
 
+# Check if releases exist
+echo "Checking for available releases..."
+if ! curl -s -f -I "$DOWNLOAD_URL" >/dev/null 2>&1; then
+    echo -e "${YELLOW}⚠️  No releases found on GitHub yet.${NC}"
+    echo ""
+    echo -e "${BLUE}This appears to be a new repository without releases.${NC}"
+    echo ""
+    echo "To create a release:"
+    echo "  1. Push a version tag: git tag v1.0.0 && git push origin v1.0.0"
+    echo "  2. GitHub Actions will automatically build and release"
+    echo "  3. Run this installer again after the release is created"
+    echo ""
+    echo "For manual release creation, see: RELEASE.md"
+    echo ""
+    echo -e "${YELLOW}Alternative: Use the developer installation${NC}"
+    echo "Run: curl -s https://raw.githubusercontent.com/cooperwalter/claude-code-webui/main/install-dev-mac.sh | bash"
+    exit 1
+fi
+
 # Remove old binary if exists
 if [ -f "$BINARY_NAME" ]; then
     rm "$BINARY_NAME"
@@ -134,6 +153,20 @@ fi
 
 # Download with progress bar
 download_with_progress "$DOWNLOAD_URL" "$BINARY_NAME"
+
+# Verify download succeeded and file is valid
+if [ ! -f "$BINARY_NAME" ]; then
+    echo -e "${RED}✗ Download failed - file not found${NC}"
+    exit 1
+fi
+
+# Check if it's actually a binary (not an HTML error page)
+if file "$BINARY_NAME" | grep -q "HTML"; then
+    echo -e "${RED}✗ Download failed - received HTML instead of binary${NC}"
+    echo -e "${YELLOW}This usually means the release doesn't exist yet.${NC}"
+    rm "$BINARY_NAME"
+    exit 1
+fi
 
 # Make it executable
 chmod +x "$BINARY_NAME"
