@@ -18,7 +18,7 @@ echo -e "${BLUE}=====================================${NC}"
 echo ""
 
 # Define paths
-APP_DIR="$HOME/Applications/ClaudeCodeWebUI"
+APP_DIR="/Applications/ClaudeCodeWebUI"
 DESKTOP_SHORTCUT="$HOME/Desktop/Claude Code Web UI"
 
 echo -e "${YELLOW}This will remove Claude Code Web UI from your system.${NC}"
@@ -35,21 +35,19 @@ echo ""
 if [[ $REPLY =~ ^[Yy]$ ]]; then
     echo ""
     
-    # Remove application directory
+    # Remove application directory (requires sudo)
     if [ -d "$APP_DIR" ]; then
-        echo -e "${BLUE}Removing application directory...${NC}"
-        rm -rf "$APP_DIR"
+        echo -e "${BLUE}Removing application directory (may require password)...${NC}"
+        sudo rm -rf "$APP_DIR"
         echo -e "${GREEN}✓ Removed $APP_DIR${NC}"
     else
         echo -e "${YELLOW}Application directory not found${NC}"
     fi
     
-    # Remove desktop shortcut
-    if [ -L "$DESKTOP_SHORTCUT" ] || [ -f "$DESKTOP_SHORTCUT" ]; then
-        echo -e "${BLUE}Removing desktop shortcut...${NC}"
-        rm -f "$DESKTOP_SHORTCUT"
-        echo -e "${GREEN}✓ Removed desktop shortcut${NC}"
-    fi
+    # Remove desktop shortcut (using AppleScript for aliases)
+    echo -e "${BLUE}Removing desktop shortcut...${NC}"
+    osascript -e 'tell application "Finder" to delete alias file "Claude Code Web UI" of desktop' 2>/dev/null || true
+    echo -e "${GREEN}✓ Removed desktop shortcut${NC}"
     
     echo ""
     echo -e "${GREEN}=====================================${NC}"

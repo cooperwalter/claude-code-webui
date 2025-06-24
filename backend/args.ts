@@ -28,7 +28,7 @@ export async function parseCliArgs(): Promise<ParsedArgs> {
     .version(version)
     .description("Claude Code Web UI Backend Server")
     .option("-p, --port <port:number>", "Port to listen on", {
-      default: parseInt(Deno.env.get("PORT") || "8080", 10),
+      default: parseInt(Deno.env.get("PORT") || "8999", 10),
     })
     .option(
       "--host <host:string>",

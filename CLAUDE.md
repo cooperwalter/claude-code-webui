@@ -126,7 +126,7 @@ The pre-commit hook prevents commits with formatting, linting, or test failures.
 - **Location**: `backend/`
 - **Main entry**: `backend/main.ts`
 - **CLI parsing**: `backend/args.ts` using Cliffy framework
-- **Port**: 8080 (configurable via CLI argument or PORT environment variable)
+- **Port**: 8999 (configurable via CLI argument or PORT environment variable)
 - **Technology**: Deno with TypeScript + Hono framework
 
 ### API Endpoints

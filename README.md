@@ -74,7 +74,7 @@ curl -LO https://github.com/cooperwalter/claude-code-webui/releases/latest/downl
 chmod +x claude-code-webui-macos-arm64
 ./claude-code-webui-macos-arm64
 
-# Open browser to http://localhost:8080
+# Open browser to http://localhost:8999
 ```
 
 ### Option 3: Development Mode
@@ -103,7 +103,7 @@ The backend server supports the following command-line options:
 
 | Option | Description | Default |
 |--------|-------------|---------|
-| `-p, --port <port>` | Port to listen on | 8080 |
+| `-p, --port <port>` | Port to listen on | 8999 |
 | `--host <host>` | Host address to bind to | 127.0.0.1 |
 | `-d, --debug` | Enable debug mode | false |
 | `-h, --help` | Show help message | - |
@@ -117,7 +117,7 @@ The backend server supports the following command-line options:
 ### Examples
 
 ```bash
-# Default (localhost:8080)
+# Default (localhost:8999)
 ./claude-code-webui
 
 # Custom port
@@ -186,10 +186,10 @@ Both backend and frontend will automatically use this port.
 
 ```bash
 # Local only (recommended)
-./claude-code-webui --port 8080
+./claude-code-webui --port 8999
 
 # Network access (trusted networks only)
-./claude-code-webui --port 8080 --host 0.0.0.0
+./claude-code-webui --port 8999 --host 0.0.0.0
 ```
 
 **Never expose to public internet without proper security measures.**

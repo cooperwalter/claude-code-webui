@@ -137,7 +137,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Technical Details
 
-- Backend serves on port 8080 (configurable)
+- Backend serves on port 8999 (configurable)
 - Frontend serves on port 3000 in development
 - Uses WebSocket-like streaming for real-time responses
 - Executes `claude --output-format stream-json --verbose -p <message>`

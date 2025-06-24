@@ -53,16 +53,16 @@ The script will:
 
 After installation, you can start Claude Code Web UI by:
 
-1. **Double-clicking** the "Claude Code Web UI" icon on your desktop
+1. **Double-clicking** the "Claude Code Web UI" alias on your desktop
 2. **Or** opening Terminal and running:
    ```bash
-   ~/Applications/ClaudeCodeWebUI/start-claude-webui.command
+   /Applications/ClaudeCodeWebUI/start-claude-webui.command
    ```
 
 ### What to Expect
 
 1. A Terminal window will open showing the server is running
-2. Your web browser will automatically open to `http://localhost:8080`
+2. Your web browser will automatically open to `http://localhost:8999`
 3. You'll see the Claude Code Web UI interface
 4. Select a project directory to start chatting with Claude!
 
@@ -88,11 +88,11 @@ To stop Claude Code Web UI:
 
 ### Browser doesn't open automatically
 
-- Manually open your browser and go to: `http://localhost:8080`
+- Manually open your browser and go to: `http://localhost:8999`
 
-### Port 8080 is already in use
+### Port 8999 is already in use
 
-- Another application is using port 8080
+- Another application is using port 8999
 - Stop that application or wait a moment and try again
 
 ## 📱 For Mobile Access
@@ -106,14 +106,14 @@ Want to use Claude Code Web UI from your iPhone or iPad while on the same networ
 2. Start Claude Code Web UI with network access:
 
    ```bash
-   ~/Applications/ClaudeCodeWebUI/claude-code-webui --host 0.0.0.0
+   /Applications/ClaudeCodeWebUI/claude-code-webui --host 0.0.0.0
    ```
 
 3. On your mobile device, open browser and go to:
    ```
-   http://[your-mac-ip]:8080
+   http://[your-mac-ip]:8999
    ```
-   Example: `http://192.168.1.100:8080`
+   Example: `http://192.168.1.100:8999`
 
 ## 🆘 Need Help?
 

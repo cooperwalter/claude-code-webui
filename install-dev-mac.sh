@@ -195,7 +195,7 @@ cat > "start-dev.sh" << 'EOF'
 echo "Starting Claude Code Web UI in development mode..."
 echo ""
 echo "Opening two terminal tabs:"
-echo "  1. Backend (Deno) - Port 8080"
+echo "  1. Backend (Deno) - Port 8999"
 echo "  2. Frontend (Vite) - Port 3000"
 echo ""
 
@@ -221,7 +221,7 @@ open_terminal_tab "cd '$PWD/frontend' && npm run dev"
 
 echo "Development servers are starting..."
 echo ""
-echo "Backend API: http://localhost:8080"
+echo "Backend API: http://localhost:8999"
 echo "Frontend UI: http://localhost:3000"
 echo ""
 echo "To stop the servers, close the Terminal tabs or press Ctrl+C in each."
