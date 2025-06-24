@@ -301,8 +301,21 @@ EOF
 cat > "$APP_DIR/start-claude-webui.command" << 'EOF'
 #!/bin/bash
 cd "$(dirname "$0")"
-clear
 
+# Create stop script
+cat > "$HOME/.claude-webui-stop.sh" << 'STOPSCRIPT'
+#!/bin/bash
+echo "Stopping Claude Code Web UI..."
+pkill -f "ngrok http 8999" || true
+pkill -f "claude-code-webui" || true
+rm -f "$HOME/.claude-webui-stop.sh"
+echo "Claude Code Web UI stopped."
+STOPSCRIPT
+chmod +x "$HOME/.claude-webui-stop.sh"
+
+# Run the actual startup in background
+(
+clear
 echo "==========================================
   Claude Code Web UI (with Ngrok)
 ==========================================
@@ -324,17 +337,6 @@ find_ngrok() {
     fi
 }
 
-# Function to cleanup on exit
-cleanup() {
-    echo ""
-    echo "Shutting down..."
-    pkill -f "ngrok http 8999" || true
-    pkill -f "claude-code-webui" || true
-    exit 0
-}
-
-trap cleanup INT TERM EXIT
-
 # Find ngrok
 NGROK_CMD=$(find_ngrok)
 if [ -z "$NGROK_CMD" ]; then
@@ -343,24 +345,33 @@ if [ -z "$NGROK_CMD" ]; then
     echo "Please install ngrok:"
     echo "  brew install ngrok/ngrok/ngrok"
     echo ""
-    echo "Or download from: https://ngrok.com/download"
-    echo ""
     echo "Starting without ngrok (local access only)..."
     echo ""
-    ./claude-code-webui --host 0.0.0.0
+    
+    # Start in background and detach
+    nohup ./claude-code-webui --host 0.0.0.0 > /tmp/claude-webui.log 2>&1 &
+    echo $! > "$HOME/.claude-webui.pid"
+    
+    sleep 2
+    echo ""
+    echo "✅ Claude Code Web UI started in background!"
+    echo ""
+    echo "📱 Access at: http://localhost:8999"
+    echo ""
+    echo "To stop later, run: ~/.claude-webui-stop.sh"
+    echo ""
+    echo "This window will close in 5 seconds..."
+    sleep 5
     exit 0
 fi
 
 echo "Found ngrok at: $NGROK_CMD"
 
-# Start Claude Code Web UI
+# Start Claude Code Web UI in background
 echo "Starting Claude Code Web UI..."
-echo ""
-echo "Note: Read-only mode must be configured in your chat requests."
-echo "The web UI will show which tools are allowed."
-echo ""
-./claude-code-webui --host 127.0.0.1 > /tmp/claude-webui.log 2>&1 &
+nohup ./claude-code-webui --host 127.0.0.1 > /tmp/claude-webui.log 2>&1 &
 CLAUDE_PID=$!
+echo $CLAUDE_PID > "$HOME/.claude-webui.pid"
 
 sleep 2
 
@@ -368,16 +379,17 @@ if ! kill -0 $CLAUDE_PID 2>/dev/null; then
     echo "Failed to start Claude Code Web UI"
     echo "Error log:"
     cat /tmp/claude-webui.log
+    sleep 5
     exit 1
 fi
 
 echo "✓ Claude Code Web UI started"
-echo ""
 
-# Start ngrok
+# Start ngrok in background
 echo "Starting ngrok tunnel..."
-$NGROK_CMD http 8999 > /tmp/ngrok.log 2>&1 &
+nohup $NGROK_CMD http 8999 > /tmp/ngrok.log 2>&1 &
 NGROK_PID=$!
+echo $NGROK_PID > "$HOME/.ngrok.pid"
 
 # Wait for ngrok to fully start
 echo "Waiting for ngrok to initialize..."
@@ -400,25 +412,13 @@ for i in {1..5}; do
 done
 
 if [ -z "$NGROK_URL" ]; then
-    echo "⚠️  Could not get ngrok URL. Checking ngrok status..."
-    if ! kill -0 $NGROK_PID 2>/dev/null; then
-        echo "Ngrok failed to start. Error log:"
-        cat /tmp/ngrok.log | head -20
-        echo ""
-        echo "Starting without ngrok (local access only)..."
-        echo ""
-        echo "Access Claude Code Web UI at: http://localhost:8999"
-        echo ""
-        echo "Press Ctrl+C to stop"
-        wait $CLAUDE_PID
-        exit 0
-    fi
+    echo "⚠️  Could not get ngrok URL. Using local access..."
     NGROK_URL="http://localhost:8999"
 fi
 
 clear
 echo "=========================================="
-echo "  🚀 Claude Code Web UI is Ready!"
+echo "  🚀 Claude Code Web UI is Running!"
 echo "=========================================="
 echo ""
 if [[ "$NGROK_URL" == https://* ]]; then
@@ -427,38 +427,52 @@ if [[ "$NGROK_URL" == https://* ]]; then
     echo ""
     echo "$NGROK_URL" | pbcopy
     echo "(URL copied to clipboard)"
+    
+    # Open in default browser
+    open "$NGROK_URL"
 else
     echo "📱 Local access only:"
     echo "http://localhost:8999"
     echo ""
-    echo "Note: Ngrok URL not available"
+    open "http://localhost:8999"
 fi
 echo ""
 echo "🔒 Security Mode: READ-ONLY"
-echo "Claude can:"
-echo "  • Read any files"
-echo "  • Run safe bash commands (grep, cat, ls, etc.)"
-echo "  • Search and analyze code"
-echo "Claude cannot:"
-echo "  • Modify or delete files"
-echo "  • Run dangerous commands"
 echo ""
-echo "Local access: http://localhost:8999"
-if [[ "$NGROK_URL" == https://* ]]; then
-    echo "Ngrok dashboard: http://localhost:4040"
-fi
+echo "✅ Running in background - you can close this window!"
 echo ""
-echo "Press Ctrl+C to stop"
+echo "To stop Claude Code Web UI later, run:"
+echo "  ~/.claude-webui-stop.sh"
 echo ""
+echo "Or use the uninstaller:"
+echo "  /Applications/ClaudeCodeWebUI/uninstall.command"
+echo ""
+echo "This window will close in 10 seconds..."
+sleep 10
+) &
 
-# Keep running
-wait $CLAUDE_PID
+# Exit immediately so Terminal can close
+exit 0
 EOF
 
 # Create alternative launcher for full permissions (if needed)
 cat > "$APP_DIR/start-full-permissions.command" << 'EOF'
 #!/bin/bash
 cd "$(dirname "$0")"
+
+# Create stop script
+cat > "$HOME/.claude-webui-stop.sh" << 'STOPSCRIPT'
+#!/bin/bash
+echo "Stopping Claude Code Web UI..."
+pkill -f "ngrok http 8999" || true
+pkill -f "claude-code-webui" || true
+rm -f "$HOME/.claude-webui-stop.sh"
+echo "Claude Code Web UI stopped."
+STOPSCRIPT
+chmod +x "$HOME/.claude-webui-stop.sh"
+
+# Run in background
+(
 clear
 echo "==========================================
   Claude Code Web UI (Full Permissions)
@@ -470,17 +484,33 @@ Only use when you need write access.
 Starting..."
 echo ""
 
+# Start in background
+nohup ./claude-code-webui --host 0.0.0.0 > /tmp/claude-webui.log 2>&1 &
+echo $! > "$HOME/.claude-webui.pid"
+
+sleep 2
+
 # Get local IP
 IP=$(ipconfig getifaddr en0 || ipconfig getifaddr en1 || echo "localhost")
 
-echo "Access from this computer: http://localhost:8999"
+echo "✅ Claude Code Web UI started in background!"
+echo ""
+echo "📱 Access from this computer: http://localhost:8999"
 if [ "$IP" != "localhost" ]; then
-    echo "Access from other devices: http://$IP:8999"
+    echo "📱 Access from other devices: http://$IP:8999"
 fi
 echo ""
-echo "Press Ctrl+C to stop"
+open "http://localhost:8999"
 echo ""
-./claude-code-webui --host 0.0.0.0
+echo "⚠️  FULL PERMISSIONS MODE - Claude can modify files!"
+echo ""
+echo "To stop later, run: ~/.claude-webui-stop.sh"
+echo ""
+echo "This window will close in 10 seconds..."
+sleep 10
+) &
+
+exit 0
 EOF
 
 chmod +x "$APP_DIR/start-claude-webui.command"
@@ -548,9 +578,15 @@ read -p "Are you sure you want to uninstall? (y/N): " -n 1 -r
 echo ""
 
 if [[ $REPLY =~ ^[Yy]$ ]]; then
+    # Stop running instances
+    ~/.claude-webui-stop.sh 2>/dev/null || true
+    
     # Remove desktop shortcut (try both alias and .command file)
     osascript -e 'tell application "Finder" to delete alias file "Claude Code Web UI" of desktop' 2>/dev/null || true
     rm -f "$HOME/Desktop/Claude Code Web UI.command" 2>/dev/null || true
+    
+    # Clean up pid files and stop script
+    rm -f "$HOME/.claude-webui.pid" "$HOME/.ngrok.pid" "$HOME/.claude-webui-stop.sh" 2>/dev/null || true
     
     # Remove application directory (requires sudo)
     echo "Removing application (may require password)..."

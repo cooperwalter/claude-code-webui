@@ -66,16 +66,20 @@ After installation, you can start Claude Code Web UI by:
 1. The installer runs automatically (no prompts unless needed)
 2. Ngrok starts and generates a friendly HTTPS URL
 3. The URL is copied to your clipboard automatically
-4. You'll see something like: `https://abc123.ngrok.io`
-5. Share this URL with anyone - no IP addresses needed!
-6. Claude runs in READ-ONLY mode by default (safer)
+4. Your browser opens automatically with the ngrok URL
+5. The app runs in the background - you can close Terminal!
+6. You'll see something like: `https://abc123.ngrok.io`
+7. Share this URL with anyone - no IP addresses needed!
+8. Claude runs in READ-ONLY mode by default (safer)
 
 ### Stopping the Application
 
 To stop Claude Code Web UI:
 
-- Close the Terminal window that's running the server
-- Or press `Ctrl+C` in the Terminal window
+- Run the stop script: `~/.claude-webui-stop.sh`
+- Or use the uninstaller: `/Applications/ClaudeCodeWebUI/uninstall.command`
+
+Note: Since it runs in the background, closing Terminal won't stop it!
 
 ## 🔧 Troubleshooting
 

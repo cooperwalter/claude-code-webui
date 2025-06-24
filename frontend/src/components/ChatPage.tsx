@@ -238,15 +238,15 @@ export function ChatPage() {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900 transition-colors duration-300">
-      <div className="max-w-6xl mx-auto p-6 h-screen flex flex-col">
+      <div className="max-w-6xl mx-auto px-4 py-6 sm:p-6 h-screen flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8 flex-shrink-0">
-          <div>
-            <h1 className="text-slate-800 dark:text-slate-100 text-3xl font-bold tracking-tight">
+        <div className="flex items-center justify-between mb-8 flex-shrink-0 gap-4">
+          <div className="min-w-0 flex-1">
+            <h1 className="text-slate-800 dark:text-slate-100 text-2xl sm:text-3xl font-bold tracking-tight">
               Claude Code Web UI
             </h1>
             {workingDirectory && (
-              <p className="text-slate-600 dark:text-slate-400 text-sm font-mono mt-1">
+              <p className="text-slate-600 dark:text-slate-400 text-sm font-mono mt-1 truncate" title={workingDirectory}>
                 {workingDirectory}
               </p>
             )}
