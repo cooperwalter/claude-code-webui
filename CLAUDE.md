@@ -10,10 +10,14 @@ A web-based interface for the `claude` command line tool that provides streaming
 
 ### Quick Start
 ```bash
-# Install dependencies (first time only)
+# Install all dependencies (first time only)
+npm install
 cd frontend && npm install && cd ..
 
-# Start both backend and frontend
+# Start both backend and frontend together
+npm run dev
+
+# Or use make commands
 make dev-backend  # Terminal 1
 make dev-frontend # Terminal 2
 
@@ -25,6 +29,15 @@ make format      # Format code
 make lint        # Run linters
 make typecheck   # Type check
 make test        # Run tests
+```
+
+### Risky Mode (Development Only)
+```bash
+# Start in risky mode - auto-approves ALL permissions
+npm run dev:risky
+
+# WARNING: Only use for trusted operations!
+# Claude will have full write access without asking
 ```
 
 ### Testing Commands

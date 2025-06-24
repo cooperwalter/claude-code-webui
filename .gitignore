@@ -9,3 +9,7 @@ frontend/demo-recordings/
 frontend/test-results/
 frontend/playwright-report/
 frontend/playwright/.cache/
+
+# Root node_modules (for concurrently)
+node_modules/
+package-lock.json

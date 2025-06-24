@@ -513,8 +513,80 @@ sleep 10
 exit 0
 EOF
 
+# Create risky mode launcher
+cat > "$APP_DIR/start-risky-mode.command" << 'EOF'
+#!/bin/bash
+cd "$(dirname "$0")"
+
+# Create stop script
+cat > "$HOME/.claude-webui-stop.sh" << 'STOPSCRIPT'
+#!/bin/bash
+echo "Stopping Claude Code Web UI..."
+pkill -f "ngrok http 8999" || true
+pkill -f "claude-code-webui" || true
+rm -f "$HOME/.claude-webui-stop.sh"
+echo "Claude Code Web UI stopped."
+STOPSCRIPT
+chmod +x "$HOME/.claude-webui-stop.sh"
+
+# Set environment variable for risky mode
+export VITE_RISKY_MODE=true
+
+# Run in background
+(
+clear
+echo "==========================================
+  Claude Code Web UI (🚨 RISKY MODE 🚨)
+==========================================
+
+⚠️  EXTREME WARNING: RISKY MODE ACTIVE!
+• ALL permissions are auto-approved
+• Claude can modify/delete ANY files
+• NO safety checks or confirmations
+• Use ONLY for fully trusted operations!
+
+Starting..."
+echo ""
+
+# Note: In production, risky mode would need to be built into the frontend
+# This is primarily for development use
+echo "⚠️  Note: Risky mode only works in development environment"
+echo "    For production use, rebuild frontend with VITE_RISKY_MODE=true"
+echo ""
+
+# Start in background
+nohup ./claude-code-webui --host 0.0.0.0 > /tmp/claude-webui.log 2>&1 &
+echo $! > "$HOME/.claude-webui.pid"
+
+sleep 2
+
+# Get local IP
+IP=$(ipconfig getifaddr en0 || ipconfig getifaddr en1 || echo "localhost")
+
+echo "✅ Claude Code Web UI started in RISKY MODE!"
+echo ""
+echo "📱 Access from this computer: http://localhost:8999"
+if [ "$IP" != "localhost" ]; then
+    echo "📱 Access from other devices: http://$IP:8999"
+fi
+echo ""
+open "http://localhost:8999"
+echo ""
+echo "🚨 RISKY MODE - NO PERMISSION DIALOGS!"
+echo "Claude has UNRESTRICTED access to your system!"
+echo ""
+echo "To stop later, run: ~/.claude-webui-stop.sh"
+echo ""
+echo "This window will close in 10 seconds..."
+sleep 10
+) &
+
+exit 0
+EOF
+
 chmod +x "$APP_DIR/start-claude-webui.command"
 chmod +x "$APP_DIR/start-full-permissions.command"
+chmod +x "$APP_DIR/start-risky-mode.command"
 echo -e "${GREEN}✓ Created launchers${NC}"
 echo ""
 
@@ -611,7 +683,7 @@ echo ""
 echo -e "${BLUE}Claude Code Web UI has been installed to:${NC}"
 echo "  $APP_DIR"
 echo ""
-echo -e "${BLUE}You have two ways to start:${NC}"
+echo -e "${BLUE}You have three ways to start:${NC}"
 echo ""
 echo "  1. ${GREEN}With Ngrok (Recommended)${NC}"
 echo "     • Double-click 'Claude Code Web UI' on desktop"
@@ -622,6 +694,12 @@ echo ""
 echo "  2. ${YELLOW}Full Permissions (Use with caution)${NC}"
 echo "     • Run: $APP_DIR/start-full-permissions.command"
 echo "     • Allows Claude to modify files"
+echo "     • Still asks for permission for each operation"
+echo ""
+echo "  3. ${RED}Risky Mode (Dangerous!)${NC}"
+echo "     • Run: $APP_DIR/start-risky-mode.command"
+echo "     • NO PERMISSION DIALOGS - auto-approves everything!"
+echo "     • Only for fully trusted operations"
 echo ""
 echo -e "${BLUE}To uninstall later:${NC}"
 echo "  Run: $APP_DIR/uninstall.command"

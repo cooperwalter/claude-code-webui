@@ -150,14 +150,31 @@ PORT=9000 DEBUG=true ./claude-code-webui
 git clone https://github.com/cooperwalter/claude-code-webui.git
 cd claude-code-webui
 
-# Start backend
-cd backend
-deno task dev
+# Install dependencies (including concurrently for root)
+npm install
 
-# Start frontend (new terminal)
-cd frontend
+# Start both backend and frontend together
 npm run dev
+
+# Or start separately:
+# Backend only: npm run dev:backend
+# Frontend only: npm run dev:frontend
 ```
+
+### 🚨 Risky Mode (Development Only)
+
+For development/testing, you can run in "risky mode" which auto-approves ALL permissions:
+
+```bash
+# Start in risky mode
+npm run dev:risky
+```
+
+**⚠️ WARNING**: In risky mode:
+- All tool permissions are automatically granted
+- No permission dialogs will appear
+- Claude can modify files, run commands, etc. without asking
+- ONLY use for trusted operations!
 
 ### Port Configuration
 

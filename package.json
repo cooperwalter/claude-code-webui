@@ -1,0 +1,42 @@
+{
+  "name": "claude-code-webui",
+  "version": "1.2.0",
+  "description": "Web-based interface for Claude Code CLI",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently -n \"backend,frontend\" -c \"blue,green\" \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "cd backend && deno task dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:risky": "concurrently -n \"backend,frontend\" -c \"red,yellow\" \"npm run dev:backend\" \"npm run dev:frontend:risky\"",
+    "dev:frontend:risky": "cd frontend && npm run dev:risky",
+    "install": "cd frontend && npm install",
+    "build": "npm run build:frontend && npm run build:backend",
+    "build:frontend": "cd frontend && npm run build",
+    "build:backend": "cd backend && deno task build",
+    "format": "make format",
+    "lint": "make lint",
+    "typecheck": "make typecheck",
+    "test": "make test",
+    "check": "make check"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cooperwalter/claude-code-webui.git"
+  },
+  "keywords": [
+    "claude",
+    "claude-code",
+    "web-ui",
+    "deno",
+    "react",
+    "typescript"
+  ],
+  "author": "cooperwalter",
+  "license": "MIT"
+}

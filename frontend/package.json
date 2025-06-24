@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:risky": "VITE_RISKY_MODE=true vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "format": "prettier --write src/",
