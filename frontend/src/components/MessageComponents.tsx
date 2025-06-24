@@ -7,6 +7,7 @@ import type {
 import { TimestampComponent } from "./TimestampComponent";
 import { MessageContainer } from "./messages/MessageContainer";
 import { CollapsibleDetails } from "./messages/CollapsibleDetails";
+import { MarkdownRenderer } from "./messages/MarkdownRenderer";
 import { MESSAGE_CONSTANTS } from "../utils/constants";
 
 interface ChatMessageComponentProps {
@@ -39,9 +40,16 @@ export function ChatMessageComponent({ message }: ChatMessageComponentProps) {
           }`}
         />
       </div>
-      <pre className="whitespace-pre-wrap text-sm font-mono leading-relaxed">
-        {message.content}
-      </pre>
+      {isUser ? (
+        <pre className="whitespace-pre-wrap text-sm font-mono leading-relaxed">
+          {message.content}
+        </pre>
+      ) : (
+        <MarkdownRenderer
+          content={message.content}
+          className="text-sm leading-relaxed"
+        />
+      )}
     </MessageContainer>
   );
 }

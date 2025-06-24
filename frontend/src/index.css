@@ -1,3 +1,35 @@
 @import "tailwindcss";
 
 @variant dark (.dark &);
+
+/* Markdown content styles */
+.markdown-content {
+  word-break: break-word;
+}
+
+/* Ensure proper spacing for nested lists */
+.markdown-content ul ul,
+.markdown-content ol ul,
+.markdown-content ul ol,
+.markdown-content ol ol {
+  margin-top: 0.5rem;
+}
+
+/* Code block syntax highlighting fallback */
+.markdown-content pre code {
+  display: block;
+  overflow-x: auto;
+}
+
+/* Improve table appearance on small screens */
+.markdown-content table {
+  display: block;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+/* Ensure images are responsive */
+.markdown-content img {
+  max-width: 100%;
+  height: auto;
+}
