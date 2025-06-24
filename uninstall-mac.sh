@@ -44,9 +44,10 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
         echo -e "${YELLOW}Application directory not found${NC}"
     fi
     
-    # Remove desktop shortcut (using AppleScript for aliases)
+    # Remove desktop shortcut (try both alias and .command file)
     echo -e "${BLUE}Removing desktop shortcut...${NC}"
     osascript -e 'tell application "Finder" to delete alias file "Claude Code Web UI" of desktop' 2>/dev/null || true
+    rm -f "$HOME/Desktop/Claude Code Web UI.command" 2>/dev/null || true
     echo -e "${GREEN}✓ Removed desktop shortcut${NC}"
     
     echo ""

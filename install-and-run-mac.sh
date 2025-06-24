@@ -492,15 +492,15 @@ echo ""
 echo -e "${BLUE}Step 6: Creating desktop shortcuts...${NC}"
 DESKTOP_DIR="$HOME/Desktop"
 if [ -d "$DESKTOP_DIR" ]; then
-    # Create an alias (not a symlink) for better macOS compatibility
-    osascript << EOF
+    # Try to create an alias using AppleScript
+    osascript << EOF 2>/dev/null
 tell application "Finder"
     try
         set sourceFile to POSIX file "$APP_DIR/start-claude-webui.command" as alias
         set desktopFolder to path to desktop
         make alias file at desktopFolder to sourceFile with properties {name:"Claude Code Web UI"}
     on error
-        -- If alias already exists, delete and recreate
+        -- If alias already exists, try to delete and recreate
         try
             delete alias file "Claude Code Web UI" of desktop
             make alias file at desktopFolder to sourceFile with properties {name:"Claude Code Web UI"}
@@ -508,7 +508,21 @@ tell application "Finder"
     end try
 end tell
 EOF
-    echo -e "${GREEN}✓ Created desktop shortcut${NC}"
+    
+    # Check if alias was created successfully
+    if [ $? -eq 0 ]; then
+        echo -e "${GREEN}✓ Created desktop shortcut${NC}"
+    else
+        # Fallback: Create a simple launcher script on desktop
+        echo -e "${YELLOW}Creating alternative desktop launcher...${NC}"
+        cat > "$DESKTOP_DIR/Claude Code Web UI.command" << EOF
+#!/bin/bash
+# Claude Code Web UI Launcher
+"$APP_DIR/start-claude-webui.command"
+EOF
+        chmod +x "$DESKTOP_DIR/Claude Code Web UI.command"
+        echo -e "${GREEN}✓ Created desktop launcher${NC}"
+    fi
 else
     echo -e "${YELLOW}Desktop directory not found, skipping shortcut creation${NC}"
 fi
@@ -534,8 +548,9 @@ read -p "Are you sure you want to uninstall? (y/N): " -n 1 -r
 echo ""
 
 if [[ $REPLY =~ ^[Yy]$ ]]; then
-    # Remove desktop shortcut using AppleScript
+    # Remove desktop shortcut (try both alias and .command file)
     osascript -e 'tell application "Finder" to delete alias file "Claude Code Web UI" of desktop' 2>/dev/null || true
+    rm -f "$HOME/Desktop/Claude Code Web UI.command" 2>/dev/null || true
     
     # Remove application directory (requires sudo)
     echo "Removing application (may require password)..."
