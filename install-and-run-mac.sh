@@ -51,6 +51,42 @@ download_with_progress() {
     curl -# -L "$url" -o "$output"
 }
 
+# Function to kill process on port
+kill_port_process() {
+    local port=$1
+    echo -e "${BLUE}Checking for existing processes on port $port...${NC}"
+    
+    # Find PIDs using the port
+    local pids=$(lsof -ti :$port 2>/dev/null)
+    
+    if [ -n "$pids" ]; then
+        echo -e "${YELLOW}Found existing process(es) on port $port${NC}"
+        for pid in $pids; do
+            local process_info=$(ps -p $pid -o comm= 2>/dev/null || echo "unknown")
+            echo "  - PID $pid ($process_info)"
+        done
+        
+        echo "Killing process(es)..."
+        for pid in $pids; do
+            kill -9 $pid 2>/dev/null || true
+        done
+        
+        # Give it a moment to clean up
+        sleep 1
+        
+        # Verify it's gone
+        if lsof -ti :$port >/dev/null 2>&1; then
+            echo -e "${RED}Warning: Could not kill all processes on port $port${NC}"
+            return 1
+        else
+            echo -e "${GREEN}✓ Port $port is now free${NC}"
+        fi
+    else
+        echo -e "${GREEN}✓ Port $port is available${NC}"
+    fi
+    return 0
+}
+
 # Check if running on macOS
 if [[ "$OSTYPE" != "darwin"* ]]; then
     echo -e "${RED}This script is designed for macOS only.${NC}"
@@ -321,6 +357,9 @@ echo "==========================================
 ==========================================
 "
 
+# Kill any existing processes on port 8999
+kill_port_process 8999
+
 # Function to find ngrok
 find_ngrok() {
     # Check common locations
@@ -484,6 +523,9 @@ Only use when you need write access.
 Starting..."
 echo ""
 
+# Kill any existing processes on port 8999
+kill_port_process 8999
+
 # Start in background
 nohup ./claude-code-webui --host 0.0.0.0 > /tmp/claude-webui.log 2>&1 &
 echo $! > "$HOME/.claude-webui.pid"
@@ -553,6 +595,9 @@ echo ""
 echo "⚠️  Note: Risky mode only works in development environment"
 echo "    For production use, rebuild frontend with VITE_RISKY_MODE=true"
 echo ""
+
+# Kill any existing processes on port 8999
+kill_port_process 8999
 
 # Start in background
 nohup ./claude-code-webui --host 0.0.0.0 > /tmp/claude-webui.log 2>&1 &
@@ -708,6 +753,10 @@ echo -e "${GREEN}Everything is ready to go!${NC}"
 echo ""
 echo -e "${BLUE}Starting Claude Code Web UI with Ngrok...${NC}"
 echo ""
+
+# Kill any existing processes on port 8999 before starting
+kill_port_process 8999
+
 sleep 2
 
 # Always start with the ngrok launcher
