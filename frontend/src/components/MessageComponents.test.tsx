@@ -23,7 +23,7 @@ describe("ChatMessageComponent", () => {
     type: "chat",
     role: "assistant",
     content: "Test message content",
-    timestamp: new Date().toISOString(),
+    timestamp: Date.now(),
   };
 
   it("renders user messages with plain text", () => {

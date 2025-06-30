@@ -47,8 +47,8 @@ async function* executeClaudeCommand(
         stdout: "piped",
       }).output();
       claudePath = new TextDecoder().decode(whichResult.stdout).trim();
-    } catch {
-      claudePath = "claude"; // fallback
+    } catch (error) {
+      throw error;
     }
 
     for await (
@@ -215,11 +215,17 @@ app.post("/api/chat", async (c) => {
 });
 
 // Static file serving with SPA fallback
+// Determine the dist path based on whether we're in a compiled binary or not
+const isCompiled = import.meta.url.startsWith("file:///");
+const distPath = isCompiled
+  ? import.meta.dirname + "/dist"
+  : import.meta.dirname + "/dist";
+
 // Serve static assets (CSS, JS, images, etc.)
-app.use("/assets/*", serveStatic({ root: import.meta.dirname + "/dist" }));
+app.use("/assets/*", serveStatic({ root: distPath }));
 
 // Serve root-level static files (favicon, etc.) with SPA fallback
-app.use("/*", serveStatic({ root: import.meta.dirname + "/dist" }));
+app.use("/*", serveStatic({ root: distPath }));
 
 // SPA fallback for all unmatched routes (but not API routes)
 app.get("*", async (c) => {
@@ -230,7 +236,7 @@ app.get("*", async (c) => {
 
   // Serve index.html for client-side routing
   try {
-    const indexPath = import.meta.dirname + "/dist/index.html";
+    const indexPath = distPath + "/index.html";
     const indexContent = await Deno.readTextFile(indexPath);
     return c.html(indexContent);
   } catch (error) {

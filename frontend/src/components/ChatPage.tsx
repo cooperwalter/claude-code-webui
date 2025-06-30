@@ -252,21 +252,32 @@ export function ChatPage() {
               )}
             </h1>
             {workingDirectory && (
-              <p className="text-slate-600 dark:text-slate-400 text-sm font-mono mt-1 truncate" title={workingDirectory}>
+              <p
+                className="text-slate-600 dark:text-slate-400 text-sm font-mono mt-1 truncate"
+                title={workingDirectory}
+              >
                 {workingDirectory}
               </p>
             )}
           </div>
           <ThemeToggle theme={theme} onToggle={toggleTheme} />
         </div>
-        
+
         {/* Risky Mode Warning */}
         {isRiskyMode && (
           <div className="mb-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg flex-shrink-0">
             <div className="flex items-start">
               <div className="flex-shrink-0">
-                <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                <svg
+                  className="h-5 w-5 text-red-400"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                    clipRule="evenodd"
+                  />
                 </svg>
               </div>
               <div className="ml-3">
@@ -274,13 +285,19 @@ export function ChatPage() {
                   Risky Mode Active - All Permissions Automatically Granted
                 </h3>
                 <div className="mt-2 text-sm text-red-700 dark:text-red-300">
-                  <p>Claude has full access to all tools without asking for permission. This includes:</p>
+                  <p>
+                    Claude has full access to all tools without asking for
+                    permission. This includes:
+                  </p>
                   <ul className="list-disc list-inside mt-1">
                     <li>Writing and modifying files</li>
                     <li>Running any bash commands</li>
                     <li>Making system changes</li>
                   </ul>
-                  <p className="mt-2 font-semibold">Only use this mode if you fully trust the operations being performed!</p>
+                  <p className="mt-2 font-semibold">
+                    Only use this mode if you fully trust the operations being
+                    performed!
+                  </p>
                 </div>
               </div>
             </div>

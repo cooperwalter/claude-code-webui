@@ -10,17 +10,14 @@ export async function parseCliArgs(): Promise<ParsedArgs> {
   // Read version from VERSION file
   let version = "unknown";
   try {
-    const versionContent = await Deno.readTextFile(
-      import.meta.dirname + "/VERSION",
-    );
+    // Try to read VERSION file from the file system first
+    const versionPath = import.meta.dirname + "/VERSION";
+    const versionContent = await Deno.readTextFile(versionPath);
     version = versionContent.trim();
-  } catch (error) {
-    console.error(
-      `Error reading VERSION file: ${
-        error instanceof Error ? error.message : String(error)
-      }`,
-    );
-    Deno.exit(1);
+  } catch {
+    // If that fails (e.g., in compiled binary), use a fallback
+    // In production builds, the version should be updated in the package.json
+    version = "1.2.0"; // This should match package.json version
   }
 
   const { options } = await new Command()
