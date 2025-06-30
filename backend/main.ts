@@ -58,7 +58,7 @@ async function* executeClaudeCommand(
           abortController,
           pathToClaudeCodeExecutable: claudePath,
           ...(sessionId ? { resume: sessionId } : {}),
-          ...(allowedTools ? { allowedTools } : {}),
+          ...(allowedTools ? { allowedTools } : ["*"]),
           ...(workingDirectory ? { cwd: workingDirectory } : {}),
         },
       })
