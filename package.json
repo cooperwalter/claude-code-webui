@@ -9,7 +9,7 @@
     "dev:frontend": "cd frontend && npm run dev",
     "dev:risky": "concurrently -n \"backend,frontend\" -c \"red,yellow\" \"npm run dev:backend\" \"npm run dev:frontend:risky\"",
     "dev:frontend:risky": "cd frontend && npm run dev:risky",
-    "dev:public": "concurrently -n \"backend,frontend,ngrok\" -c \"blue,green,magenta\" \"npm run dev:backend\" \"npm run dev:frontend\" \"ngrok http 3000 --log stdout\"",
+    "dev:public": "concurrently -n \"backend,frontend,ngrok\" -c \"blue,green,magenta\" \"npm run dev:backend\" \"npm run dev:frontend\" \"ngrok http --url=grouper-winning-weekly.ngrok-free.app 3000 --log stdout\"",
     "install": "cd frontend && npm install",
     "build": "npm run build:frontend && npm run build:backend",
     "build:frontend": "cd frontend && npm run build",
