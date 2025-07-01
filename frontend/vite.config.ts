@@ -20,8 +20,8 @@ export default defineConfig(({ mode }) => {
       },
     },
     server: {
-      port: 3000,
-      allowedHosts: [".ngrok-free.app", ".ngrok.io", "localhost"],
+      port: 3333,
+      allowedHosts: [".ngrok-free.app", ".ngrok.io", "localhost", "grouper-winning-weekly.ngrok-free.app"],
       proxy: {
         "/api": {
           target: `http://localhost:${apiPort}`,
