@@ -10,6 +10,8 @@
     "dev:risky": "concurrently -n \"backend,frontend\" -c \"red,yellow\" \"npm run dev:backend\" \"npm run dev:frontend:risky\"",
     "dev:frontend:risky": "cd frontend && npm run dev:risky",
     "dev:public": "concurrently -n \"backend,frontend,ngrok\" -c \"blue,green,magenta\" \"npm run dev:backend\" \"npm run dev:frontend\" \"ngrok http --url=grouper-winning-weekly.ngrok-free.app 3333 --log stdout\"",
+    "dev:public:bg": "./scripts/start-dev-public-background.sh",
+    "stop": "./scripts/stop-dev-public.sh",
     "install": "cd frontend && npm install",
     "build": "npm run build:frontend && npm run build:backend",
     "build:frontend": "cd frontend && npm run build",
