@@ -57,7 +57,7 @@ async function* executeClaudeCommand(
         prompt: processedMessage,
         options: {
           abortController,
-          pathToClaudeCodeExecutable: "/Users/cooper/.claude/local/claude",
+          pathToClaudeCodeExecutable: claudePath,
           ...(sessionId ? { resume: sessionId } : {}),
           allowedTools: getAllowedTools(allowedTools),
           ...(workingDirectory ? { cwd: workingDirectory } : {}),
