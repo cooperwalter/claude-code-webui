@@ -4,6 +4,7 @@ import { serveStatic } from "hono/deno";
 import { AbortError, query } from "@anthropic-ai/claude-code";
 import type { ChatRequest, StreamResponse } from "../shared/types.ts";
 import { parseCliArgs } from "./args.ts";
+import { getAllowedTools } from "./config/allowedTools.ts";
 
 const args = await parseCliArgs();
 
@@ -56,9 +57,9 @@ async function* executeClaudeCommand(
         prompt: processedMessage,
         options: {
           abortController,
-          pathToClaudeCodeExecutable: claudePath,
+          pathToClaudeCodeExecutable: "/Users/cooper/.claude/local/claude",
           ...(sessionId ? { resume: sessionId } : {}),
-          ...(allowedTools ? { allowedTools } : ["*"]),
+          allowedTools: getAllowedTools(allowedTools),
           ...(workingDirectory ? { cwd: workingDirectory } : {}),
         },
       })
